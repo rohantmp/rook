@@ -39,6 +39,15 @@ type DataPathMap struct {
 	// persisted to the host. The log dir is always /var/log/ceph. If logs are not persisted to the
 	// host, logs are not shared between containers via empty dir or any other mechanism.
 	HostLogDir string
+
+	// ContainerLogDir represents Ceph's logging directory
+	ContainerLogDir string
+
+	// HostCrashDir represents Ceph's crash reports directory on the host
+	HostCrashDir string
+
+	// ContainerCrashDir represents Ceph's crash reports directory
+	ContainerCrashDir string
 }
 
 // NewStatefulDaemonDataPathMap returns a new DataPathMap for a daemon which requires a persistent
@@ -51,9 +60,12 @@ func NewStatefulDaemonDataPathMap(
 	daemonType DaemonType, daemonID, namespace string,
 ) *DataPathMap {
 	return &DataPathMap{
-		HostDataDir:      path.Join(dataDirHostPath, daemonDataDirHostRelativePath),
-		ContainerDataDir: cephDataDir(daemonType, daemonID),
-		HostLogDir:       path.Join(dataDirHostPath, namespace, "log"),
+		HostDataDir:       path.Join(dataDirHostPath, daemonDataDirHostRelativePath),
+		ContainerDataDir:  cephDataDir(daemonType, daemonID),
+		HostLogDir:        path.Join(dataDirHostPath, namespace, "log"),
+		ContainerLogDir:   VarLogCephDir,
+		HostCrashDir:      path.Join(dataDirHostPath, namespace, "crash"),
+		ContainerCrashDir: VarCrashCephDir,
 	}
 }
 
@@ -63,9 +75,12 @@ func NewStatelessDaemonDataPathMap(
 	daemonType DaemonType, daemonID, namespace, dataDirHostPath string,
 ) *DataPathMap {
 	return &DataPathMap{
-		HostDataDir:      "",
-		ContainerDataDir: cephDataDir(daemonType, daemonID),
-		HostLogDir:       path.Join(dataDirHostPath, namespace, "log"),
+		HostDataDir:       "",
+		ContainerDataDir:  cephDataDir(daemonType, daemonID),
+		HostLogDir:        path.Join(dataDirHostPath, namespace, "log"),
+		ContainerLogDir:   VarLogCephDir,
+		HostCrashDir:      path.Join(dataDirHostPath, namespace, "crash"),
+		ContainerCrashDir: VarCrashCephDir,
 	}
 }
 
@@ -73,9 +88,12 @@ func NewStatelessDaemonDataPathMap(
 // dir in the container as the mon, mgr, osd, mds, and rgw daemons do.
 func NewDatalessDaemonDataPathMap(namespace, dataDirHostPath string) *DataPathMap {
 	return &DataPathMap{
-		HostDataDir:      "",
-		ContainerDataDir: "",
-		HostLogDir:       path.Join(dataDirHostPath, namespace, "log"),
+		HostDataDir:       "",
+		ContainerDataDir:  "",
+		HostLogDir:        path.Join(dataDirHostPath, namespace, "log"),
+		ContainerLogDir:   VarLogCephDir,
+		HostCrashDir:      path.Join(dataDirHostPath, namespace, "crash"),
+		ContainerCrashDir: VarCrashCephDir,
 	}
 }
 

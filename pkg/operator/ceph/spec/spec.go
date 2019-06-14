@@ -36,6 +36,7 @@ const (
 	ConfigInitContainerName = "config-init"
 	logVolumeName           = "rook-ceph-log"
 	volumeMountSubPath      = "data"
+	crashVolumeName         = "rook-ceph-crash"
 )
 
 var logger = capnslog.NewPackageLogger("github.com/rook/rook", "ceph-spec")
@@ -103,6 +104,7 @@ func PodVolumes(dataDirHostPath, namespace string, confGeneratedInPod bool) []v1
 		{Name: k8sutil.DataDirVolume, VolumeSource: dataDirSource},
 		configVolume,
 		StoredLogVolume(path.Join(dataDirHostPath, namespace, "log")),
+		StoredCrashVolume(path.Join(dataDirHostPath, namespace, "crash")),
 	}
 }
 
@@ -117,6 +119,8 @@ func CephVolumeMounts(confGeneratedInPod bool) []v1.VolumeMount {
 		{Name: k8sutil.DataDirVolume, MountPath: k8sutil.DataDir},
 		configMount,
 		StoredLogVolumeMount(),
+		StoredCrashVolumeMount(),
+		// Rook doesn't run in ceph containers, so it doesn't need the config override mounted
 	}
 }
 
@@ -140,6 +144,7 @@ func DaemonVolumesBase(dataPaths *config.DataPathMap, keyringResourceName string
 	if dataPaths.HostLogDir != "" {
 		// logs are not persisted to host
 		vols = append(vols, StoredLogVolume(dataPaths.HostLogDir))
+		vols = append(vols, StoredCrashVolume(dataPaths.HostCrashDir))
 	}
 	return vols
 }
@@ -206,6 +211,7 @@ func DaemonVolumeMounts(dataPaths *config.DataPathMap, keyringResourceName strin
 	if dataPaths.HostLogDir != "" {
 		// logs are not persisted to host, so no mount is needed
 		mounts = append(mounts, StoredLogVolumeMount())
+		mounts = append(mounts, StoredCrashVolumeMount())
 	}
 	if dataPaths.ContainerDataDir == "" {
 		// no data is stored in container, so there are no more mounts
@@ -373,5 +379,24 @@ func PodLifeCycle(dataDirHostPath string) *v1.Lifecycle {
 				Command: cmd,
 			},
 		},
+	}
+}
+
+// StoredCrashVolume returns a pod volume sourced from the stored crash files.
+func StoredCrashVolume(HostCrashDir string) v1.Volume {
+	return v1.Volume{
+		Name: crashVolumeName,
+		VolumeSource: v1.VolumeSource{
+			HostPath: &v1.HostPathVolumeSource{Path: HostCrashDir},
+		},
+	}
+}
+
+// StoredCrashVolumeMount returns a pod volume sourced from the stored log files.
+func StoredCrashVolumeMount() v1.VolumeMount {
+	return v1.VolumeMount{
+		Name:      crashVolumeName,
+		ReadOnly:  false,
+		MountPath: config.VarCrashCephDir,
 	}
 }

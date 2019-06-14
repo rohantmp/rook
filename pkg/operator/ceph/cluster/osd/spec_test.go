@@ -113,10 +113,10 @@ func testPodDevices(t *testing.T, dataDir, deviceName string, allDevices bool) {
 	assert.Equal(t, "node1", deployment.Spec.Template.Spec.NodeSelector[v1.LabelHostname])
 	assert.Equal(t, v1.RestartPolicyAlways, deployment.Spec.Template.Spec.RestartPolicy)
 	if devMountNeeded && len(dataDir) > 0 {
-		assert.Equal(t, 5, len(deployment.Spec.Template.Spec.Volumes))
+		assert.Equal(t, 6, len(deployment.Spec.Template.Spec.Volumes))
 	}
 	if devMountNeeded && len(dataDir) == 0 {
-		assert.Equal(t, 5, len(deployment.Spec.Template.Spec.Volumes))
+		assert.Equal(t, 6, len(deployment.Spec.Template.Spec.Volumes))
 	}
 	if !devMountNeeded && len(dataDir) > 0 {
 		assert.Equal(t, 1, len(deployment.Spec.Template.Spec.Volumes))
@@ -133,12 +133,12 @@ func testPodDevices(t *testing.T, dataDir, deviceName string, allDevices bool) {
 	initCont := deployment.Spec.Template.Spec.InitContainers[0]
 	assert.Equal(t, "rook/rook:myversion", initCont.Image)
 	assert.Equal(t, "config-init", initCont.Name)
-	assert.Equal(t, 3, len(initCont.VolumeMounts))
+	assert.Equal(t, 4, len(initCont.VolumeMounts))
 
 	assert.Equal(t, 1, len(deployment.Spec.Template.Spec.Containers))
 	cont := deployment.Spec.Template.Spec.Containers[0]
 	assert.Equal(t, cephVersion.Image, cont.Image)
-	assert.Equal(t, 5, len(cont.VolumeMounts))
+	assert.Equal(t, 6, len(cont.VolumeMounts))
 	assert.Equal(t, "ceph-osd", cont.Command[0])
 }
 
@@ -198,22 +198,24 @@ func TestStorageSpecDevicesAndDirectories(t *testing.T) {
 	assert.Nil(t, err)
 	// pod spec should have a volume for the given dir in the main container and the init container
 	podSpec := deployment.Spec.Template.Spec
-	assert.Equal(t, 5, len(podSpec.Volumes))
+	assert.Equal(t, 6, len(podSpec.Volumes))
 	require.Equal(t, 1, len(podSpec.Containers))
 	cont := podSpec.Containers[0]
-	assert.Equal(t, 5, len(cont.VolumeMounts))
+	assert.Equal(t, 6, len(cont.VolumeMounts))
 	assert.Equal(t, "/var/lib/rook", cont.VolumeMounts[0].MountPath)
 	assert.Equal(t, "/etc/ceph", cont.VolumeMounts[1].MountPath)
 	assert.Equal(t, "/var/log/ceph", cont.VolumeMounts[2].MountPath)
-	assert.Equal(t, "/my/root/path", cont.VolumeMounts[3].MountPath)
+	assert.Equal(t, "/var/lib/ceph/crash", cont.VolumeMounts[3].MountPath)
+	assert.Equal(t, "/my/root/path", cont.VolumeMounts[4].MountPath)
 
 	require.Equal(t, 2, len(podSpec.InitContainers))
 	initCont := podSpec.InitContainers[0]
-	assert.Equal(t, 4, len(initCont.VolumeMounts))
+	assert.Equal(t, 5, len(initCont.VolumeMounts))
 	assert.Equal(t, "/var/lib/rook", initCont.VolumeMounts[0].MountPath)
 	assert.Equal(t, "/etc/ceph", initCont.VolumeMounts[1].MountPath)
 	assert.Equal(t, "/var/log/ceph", initCont.VolumeMounts[2].MountPath)
-	assert.Equal(t, "/my/root/path", initCont.VolumeMounts[3].MountPath)
+	assert.Equal(t, "/var/lib/ceph/crash", initCont.VolumeMounts[3].MountPath)
+	assert.Equal(t, "/my/root/path", initCont.VolumeMounts[4].MountPath)
 
 	// the default osd created on a node will be under /var/lib/rook, which won't need an extra mount
 	osd = OSDInfo{
@@ -226,10 +228,10 @@ func TestStorageSpecDevicesAndDirectories(t *testing.T) {
 	assert.Nil(t, err)
 	// pod spec should have a volume for the given dir in the main container and the init container
 	podSpec = deployment.Spec.Template.Spec
-	assert.Equal(t, 4, len(podSpec.Volumes))
+	assert.Equal(t, 5, len(podSpec.Volumes))
 	require.Equal(t, 1, len(podSpec.Containers))
 	cont = podSpec.Containers[0]
-	require.Equal(t, 4, len(cont.VolumeMounts))
+	require.Equal(t, 5, len(cont.VolumeMounts))
 	assert.Equal(t, "/var/lib/rook", cont.VolumeMounts[0].MountPath)
 	assert.Equal(t, "/etc/ceph", cont.VolumeMounts[1].MountPath)
 
@@ -237,10 +239,11 @@ func TestStorageSpecDevicesAndDirectories(t *testing.T) {
 
 	require.Equal(t, 2, len(podSpec.InitContainers))
 	initCont = podSpec.InitContainers[0]
-	require.Equal(t, 3, len(initCont.VolumeMounts))
+	require.Equal(t, 4, len(initCont.VolumeMounts))
 	assert.Equal(t, "/var/lib/rook", initCont.VolumeMounts[0].MountPath)
 	assert.Equal(t, "/etc/ceph", initCont.VolumeMounts[1].MountPath)
 	assert.Equal(t, "/var/log/ceph", initCont.VolumeMounts[2].MountPath)
+	assert.Equal(t, "/var/lib/ceph/crash", initCont.VolumeMounts[3].MountPath)
 }
 
 func TestStorageSpecConfig(t *testing.T) {

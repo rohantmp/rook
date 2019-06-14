@@ -21,6 +21,7 @@ package config
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/coreos/pkg/capnslog"
@@ -71,6 +72,9 @@ var (
 	// VarLogCephDir defines Ceph logging directory. It is made overwriteable only for unit tests where it
 	// may be needed to send data intended for /var/log/ceph to a temporary test dir.
 	VarLogCephDir = "/var/log/ceph"
+
+	// VarCrashCephDir defines Ceph crash reports directory.
+	VarCrashCephDir = path.Join(VarLibCephDir, "crash")
 
 	// chownUserGroup represents ceph:ceph
 	chownUserGroup = CephUser + ":" + CephGroup

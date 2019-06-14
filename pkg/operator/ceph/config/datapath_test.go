@@ -26,17 +26,23 @@ func TestNewStatefulDaemonDataPathMap(t *testing.T) {
 	// mon
 	d := NewStatefulDaemonDataPathMap("/var/lib/rook", "/mon-a/data", MonType, "a", "rook-ceph")
 	assert.Equal(t, &DataPathMap{
-		HostDataDir:      "/var/lib/rook/mon-a/data",
-		ContainerDataDir: "/var/lib/ceph/mon/ceph-a",
-		HostLogDir:       "/var/lib/rook/rook-ceph/log",
+		HostDataDir:       "/var/lib/rook/mon-a/data",
+		ContainerDataDir:  "/var/lib/ceph/mon/ceph-a",
+		ContainerLogDir:   "/var/log/ceph",
+		HostLogDir:        "/var/lib/rook/rook-ceph/log",
+		HostCrashDir:      "/var/lib/rook/rook-ceph/crash",
+		ContainerCrashDir: "/var/lib/ceph/crash",
 	}, d)
 
 	// osd
 	d = NewStatefulDaemonDataPathMap("/var/lib/rook/", "osd0/", OsdType, "0", "rook-ceph")
 	assert.Equal(t, &DataPathMap{
-		HostDataDir:      "/var/lib/rook/osd0",
-		ContainerDataDir: "/var/lib/ceph/osd/ceph-0",
-		HostLogDir:       "/var/lib/rook/rook-ceph/log",
+		HostDataDir:       "/var/lib/rook/osd0",
+		ContainerDataDir:  "/var/lib/ceph/osd/ceph-0",
+		ContainerLogDir:   "/var/log/ceph",
+		HostLogDir:        "/var/lib/rook/rook-ceph/log",
+		HostCrashDir:      "/var/lib/rook/rook-ceph/crash",
+		ContainerCrashDir: "/var/lib/ceph/crash",
 	}, d)
 }
 
@@ -44,25 +50,34 @@ func TestNewStatelessDaemonDataPathMap(t *testing.T) {
 	// mgr
 	d := NewStatelessDaemonDataPathMap(MgrType, "a", "rook-ceph", "/var/lib/rook")
 	assert.Equal(t, &DataPathMap{
-		HostDataDir:      "",
-		ContainerDataDir: "/var/lib/ceph/mgr/ceph-a",
-		HostLogDir:       "/var/lib/rook/rook-ceph/log",
+		HostDataDir:       "",
+		ContainerDataDir:  "/var/lib/ceph/mgr/ceph-a",
+		ContainerLogDir:   "/var/log/ceph",
+		HostLogDir:        "/var/lib/rook/rook-ceph/log",
+		HostCrashDir:      "/var/lib/rook/rook-ceph/crash",
+		ContainerCrashDir: "/var/lib/ceph/crash",
 	}, d)
 
 	// mds
 	d = NewStatelessDaemonDataPathMap(MdsType, "myfs.a", "rook-ceph", "/var/lib/rook")
 	assert.Equal(t, &DataPathMap{
-		HostDataDir:      "",
-		ContainerDataDir: "/var/lib/ceph/mds/ceph-myfs.a",
-		HostLogDir:       "/var/lib/rook/rook-ceph/log",
+		HostDataDir:       "",
+		ContainerDataDir:  "/var/lib/ceph/mds/ceph-myfs.a",
+		ContainerLogDir:   "/var/log/ceph",
+		HostLogDir:        "/var/lib/rook/rook-ceph/log",
+		HostCrashDir:      "/var/lib/rook/rook-ceph/crash",
+		ContainerCrashDir: "/var/lib/ceph/crash",
 	}, d)
 
 	// rgw
 	d = NewStatelessDaemonDataPathMap(RgwType, "objstore", "rook-ceph", "/var/lib/rook")
 	assert.Equal(t, &DataPathMap{
-		HostDataDir:      "",
-		ContainerDataDir: "/var/lib/ceph/rgw/ceph-objstore",
-		HostLogDir:       "/var/lib/rook/rook-ceph/log",
+		HostDataDir:       "",
+		ContainerDataDir:  "/var/lib/ceph/rgw/ceph-objstore",
+		ContainerLogDir:   "/var/log/ceph",
+		HostLogDir:        "/var/lib/rook/rook-ceph/log",
+		HostCrashDir:      "/var/lib/rook/rook-ceph/crash",
+		ContainerCrashDir: "/var/lib/ceph/crash",
 	}, d)
 }
 
@@ -70,8 +85,11 @@ func TestNewDatalessDaemonDataPathMap(t *testing.T) {
 	// rbdmirror
 	d := NewDatalessDaemonDataPathMap("rook-ceph", "/var/lib/rook")
 	assert.Equal(t, &DataPathMap{
-		HostDataDir:      "",
-		ContainerDataDir: "",
-		HostLogDir:       "/var/lib/rook/rook-ceph/log",
+		HostDataDir:       "",
+		ContainerDataDir:  "",
+		HostLogDir:        "/var/lib/rook/rook-ceph/log",
+		ContainerLogDir:   "/var/log/ceph",
+		HostCrashDir:      "/var/lib/rook/rook-ceph/crash",
+		ContainerCrashDir: "/var/lib/ceph/crash",
 	}, d)
 }
