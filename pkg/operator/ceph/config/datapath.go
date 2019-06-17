@@ -88,7 +88,7 @@ func NewStatelessDaemonDataPathMap(
 // dir in the container as the mon, mgr, osd, mds, and rgw daemons do.
 func NewDatalessDaemonDataPathMap(namespace, dataDirHostPath string) *DataPathMap {
 	return &DataPathMap{
-		HostDataDir:       "",
+		HostDataDir:       dataDirHostPath,
 		ContainerDataDir:  "",
 		HostLogDir:        path.Join(dataDirHostPath, namespace, "log"),
 		ContainerLogDir:   VarLogCephDir,

@@ -53,6 +53,9 @@ const (
 	// RbdMirrorType defines the rbd-mirror DaemonType
 	RbdMirrorType DaemonType = "rbd-mirror"
 
+	// CrashType defines the rbd-mirror DaemonType
+	CrashType DaemonType = "crash"
+
 	// CephUser is the Linux Ceph username
 	CephUser = "ceph"
 

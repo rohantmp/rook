@@ -47,6 +47,7 @@ const (
 	appName                = "rook-ceph-mgr"
 	serviceAccountName     = "rook-ceph-mgr"
 	prometheusModuleName   = "prometheus"
+	crashModuleName        = "crash"
 	pgautoscalerModuleName = "pg_autoscaler"
 	metricsPort            = 9283
 	monitoringPath         = "/etc/ceph-monitoring/"
@@ -193,6 +194,10 @@ func (c *Cluster) Start() error {
 			logger.Errorf("failed to enable mgr prometheus module. %+v", err)
 		}
 
+		if err := c.enableCrashModule(c.Namespace); err != nil {
+			logger.Errorf("failed to enable mgr crash module. %+v", err)
+		}
+
 		if err := c.configureDashboard(mgrConfig); err != nil {
 			logger.Errorf("failed to enable mgr dashboard. %+v", err)
 		}
@@ -247,6 +252,14 @@ func (c *Cluster) Start() error {
 func (c *Cluster) enablePrometheusModule(clusterName string) error {
 	if err := client.MgrEnableModule(c.context, clusterName, prometheusModuleName, true); err != nil {
 		return fmt.Errorf("failed to enable mgr prometheus module. %+v", err)
+	}
+	return nil
+}
+
+// Ceph docs about the crash module: https://docs.ceph.com/docs/master/mgr/crash/
+func (c *Cluster) enableCrashModule(clusterName string) error {
+	if err := client.MgrEnableModule(c.context, clusterName, crashModuleName, true); err != nil {
+		return fmt.Errorf("failed to enable mgr crash module. %+v", err)
 	}
 	return nil
 }
@@ -307,7 +320,7 @@ func (c *Cluster) moduleMeetsMinVersion(name string) (*cephver.CephVersion, bool
 }
 
 func wellKnownModule(name string) bool {
-	knownModules := []string{rookModuleName, dashboardModuleName, prometheusModuleName}
+	knownModules := []string{rookModuleName, dashboardModuleName, prometheusModuleName, crashModuleName}
 	for _, known := range knownModules {
 		if name == known {
 			return true

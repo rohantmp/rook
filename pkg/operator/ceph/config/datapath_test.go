@@ -85,7 +85,7 @@ func TestNewDatalessDaemonDataPathMap(t *testing.T) {
 	// rbdmirror
 	d := NewDatalessDaemonDataPathMap("rook-ceph", "/var/lib/rook")
 	assert.Equal(t, &DataPathMap{
-		HostDataDir:       "",
+		HostDataDir:       "/var/lib/rook",
 		ContainerDataDir:  "",
 		HostLogDir:        "/var/lib/rook/rook-ceph/log",
 		ContainerLogDir:   "/var/log/ceph",
