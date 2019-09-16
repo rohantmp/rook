@@ -242,7 +242,7 @@ func (c *Cluster) makeChownInitContainer(monConfig *monConfig) v1.Container {
 		Args: []string{
 			"--verbose",
 			"--recursive",
-			"ceph:ceph",
+			config.ChownUserGroup,
 			monConfig.DataPathMap.ContainerDataDir,
 			config.VarLogCephDir,
 		},

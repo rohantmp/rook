@@ -76,12 +76,12 @@ var (
 	// VarCrashCephDir defines Ceph crash reports directory.
 	VarCrashCephDir = path.Join(VarLibCephDir, "crash")
 
-	// chownUserGroup represents ceph:ceph
-	chownUserGroup = CephUser + ":" + CephGroup
+	// ChownUserGroup represents ceph:ceph
+	ChownUserGroup = CephUser + ":" + CephGroup
 
 	// ContainerPostStartCmd is the command we run before starting any Ceph daemon
 	// It makes sure Ceph directories are owned by 'ceph'
-	ContainerPostStartCmd = []string{"chown", "--recursive", chownUserGroup, VarLogCephDir}
+	ContainerPostStartCmd = []string{"chown", "--recursive", ChownUserGroup, VarLogCephDir}
 )
 
 // normalizeKey converts a key in any format to a key with underscores.
