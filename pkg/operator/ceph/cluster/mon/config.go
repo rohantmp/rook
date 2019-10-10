@@ -39,8 +39,8 @@ import (
 )
 
 const (
-	// All mons share the same keyring
-	keyringStoreName = "rook-ceph-mons"
+	// KeyringStoreName is the keyringname shared by all mons
+	KeyringStoreName = "rook-ceph-mons"
 
 	// The final string field is for the admin keyring
 	keyringTemplate = `

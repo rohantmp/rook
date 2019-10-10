@@ -190,7 +190,7 @@ func (c *Cluster) makeMonPod(monConfig *monConfig) *v1.Pod {
 		RestartPolicy: v1.RestartPolicyAlways,
 		// we decide later whether to use a PVC volume or host volumes for mons, so only populate
 		// the base volumes at this point.
-		Volumes:     opspec.DaemonVolumesBase(monConfig.DataPathMap, keyringStoreName),
+		Volumes:     opspec.DaemonVolumesBase(monConfig.DataPathMap, KeyringStoreName),
 		HostNetwork: c.Network.IsHost(),
 	}
 	if c.Network.IsHost() {
@@ -247,7 +247,7 @@ func (c *Cluster) makeChownInitContainer(monConfig *monConfig) v1.Container {
 			config.VarLogCephDir,
 		},
 		Image:           c.spec.CephVersion.Image,
-		VolumeMounts:    opspec.DaemonVolumeMounts(monConfig.DataPathMap, keyringStoreName),
+		VolumeMounts:    opspec.DaemonVolumeMounts(monConfig.DataPathMap, KeyringStoreName),
 		Resources:       cephv1.GetMonResources(c.spec.Resources),
 		SecurityContext: PodSecurityContext(),
 	}
@@ -268,7 +268,7 @@ func (c *Cluster) makeMonFSInitContainer(monConfig *monConfig) v1.Container {
 			"--mkfs",
 		),
 		Image:           c.spec.CephVersion.Image,
-		VolumeMounts:    opspec.DaemonVolumeMounts(monConfig.DataPathMap, keyringStoreName),
+		VolumeMounts:    opspec.DaemonVolumeMounts(monConfig.DataPathMap, KeyringStoreName),
 		SecurityContext: PodSecurityContext(),
 		// filesystem creation does not require ports to be exposed
 		Env:       opspec.DaemonEnvVars(c.spec.CephVersion.Image),
@@ -308,7 +308,7 @@ func (c *Cluster) makeMonDaemonContainer(monConfig *monConfig) v1.Container {
 			config.NewFlag("setuser-match-path", path.Join(monConfig.DataPathMap.ContainerDataDir, "store.db")),
 		),
 		Image:           c.spec.CephVersion.Image,
-		VolumeMounts:    opspec.DaemonVolumeMounts(monConfig.DataPathMap, keyringStoreName),
+		VolumeMounts:    opspec.DaemonVolumeMounts(monConfig.DataPathMap, KeyringStoreName),
 		SecurityContext: PodSecurityContext(),
 		Ports: []v1.ContainerPort{
 			{
