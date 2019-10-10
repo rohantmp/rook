@@ -32,7 +32,6 @@ import (
 	"github.com/rook/rook/pkg/clusterd"
 	"github.com/rook/rook/pkg/daemon/ceph/client"
 	cephconfig "github.com/rook/rook/pkg/daemon/ceph/config"
-	"github.com/rook/rook/pkg/operator/ceph/cluster/crash"
 	"github.com/rook/rook/pkg/operator/ceph/cluster/mgr"
 	"github.com/rook/rook/pkg/operator/ceph/cluster/mon"
 	"github.com/rook/rook/pkg/operator/ceph/cluster/osd"
@@ -284,13 +283,6 @@ func (c *cluster) doOrchestration(rookImage string, cephVersion cephver.CephVers
 		err = rbdmirror.Start()
 		if err != nil {
 			return fmt.Errorf("failed to start the rbd mirrors. %+v", err)
-		}
-
-		// Start the ceph crash daemonsets
-		crash := crash.New(c.Info, c.context, c.Namespace, rookImage, spec.CephVersion, spec.Network, c.Spec.DataDirHostPath)
-		err = crash.Start()
-		if err != nil {
-			return fmt.Errorf("failed to start ceph crash. %+v", err)
 		}
 
 		logger.Infof("Done creating rook instance in namespace %s", c.Namespace)
