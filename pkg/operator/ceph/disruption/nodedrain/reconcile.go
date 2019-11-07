@@ -127,6 +127,7 @@ func (r *ReconcileNode) reconcile(request reconcile.Request) (reconcile.Result, 
 			}
 		}
 	}
+
 	controllerBool := false
 	blockOwnerDeletionBool := false
 	// Create or Update the deployment default/foo
@@ -166,9 +167,16 @@ func (r *ReconcileNode) reconcile(request reconcile.Request) (reconcile.Result, 
 				MatchLabels: selectorLabels,
 			}
 		}
-
-		// update the deployment labelsCRUSH
-		deploy.ObjectMeta.Labels = selectorLabels
+		topology, _ := osd.ExtractRookTopologyFromLabels(node.GetLabels())
+		objectLabels := make(map[string]string)
+		for key, value := range selectorLabels {
+			objectLabels[key] = value
+		}
+		for key, value := range topology {
+			objectLabels[key] = value
+		}
+		// update the deployment labels
+		deploy.ObjectMeta.Labels = objectLabels
 
 		// update the Deployment pod template
 		deploy.Spec.Template = corev1.PodTemplateSpec{
