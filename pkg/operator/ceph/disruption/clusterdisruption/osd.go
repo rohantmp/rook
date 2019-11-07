@@ -24,9 +24,11 @@ import (
 
 	cephClient "github.com/rook/rook/pkg/daemon/ceph/client"
 	"github.com/rook/rook/pkg/operator/ceph/cluster/osd"
+	"github.com/rook/rook/pkg/operator/ceph/disruption/nodedrain"
 	"github.com/rook/rook/pkg/operator/k8sutil"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -232,6 +234,11 @@ func (r *ReconcileClusterDisruption) updateNoout(pdbStateMap *corev1.ConfigMap, 
 			} else {
 				// set noout
 				osdDump.UpdateFlagOnCrushUnit(r.context.ClusterdContext, true, namespace, failureDomain, nooutFlag)
+				// delete possibly stale deployments
+				err := r.client.DeleteAllOf(context.TODO(), &appsv1.Deployment{}, client.MatchingLabels{k8sutil.AppAttr: nodedrain.CanaryAppName}, client.InNamespace(r.context.OperatorNamespace))
+				if err != nil {
+					logger.Warningf("could not delete drain-canaries to remove stale deployments: %+v", err)
+				}
 			}
 
 		} else {

@@ -151,7 +151,7 @@ func (r *ReconcileNode) reconcile(request reconcile.Request) (reconcile.Result, 
 	mutateFunc := func() error {
 
 		// lablels for the pod, the deployment, and the deploymentSelector
-		deploymentLabels := map[string]string{
+		selectorLabels := map[string]string{
 			corev1.LabelHostname: nodeHostnameLabel,
 			k8sutil.AppAttr:      CanaryAppName,
 			NodeNameLabel:        node.GetName(),
@@ -163,16 +163,16 @@ func (r *ReconcileNode) reconcile(request reconcile.Request) (reconcile.Result, 
 		// a new object is going to be created
 		if deploy.ObjectMeta.CreationTimestamp.IsZero() {
 			deploy.Spec.Selector = &metav1.LabelSelector{
-				MatchLabels: deploymentLabels,
+				MatchLabels: selectorLabels,
 			}
 		}
 
-		// update
-		deploy.ObjectMeta.Labels = deploymentLabels
+		// update the deployment labelsCRUSH
+		deploy.ObjectMeta.Labels = selectorLabels
 
 		// update the Deployment pod template
 		deploy.Spec.Template = corev1.PodTemplateSpec{
-			ObjectMeta: metav1.ObjectMeta{Labels: deploymentLabels},
+			ObjectMeta: metav1.ObjectMeta{Labels: selectorLabels},
 			Spec: corev1.PodSpec{
 				NodeSelector: nodeSelector,
 				Containers:   newDoNothingContainers(r.context.RookImage),
